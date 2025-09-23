@@ -473,7 +473,8 @@ Call.prototype.joinRoom_ = function() {
         }
         return;
       }
-      trace('Joined the room.');
+      trace('Joined the room@call.js');
+      trace('joinRoom_ path', path);
       resolve(responseObj.params);
     }.bind(this)).catch(function(error) {
       reject(Error('Failed to join the room: ' + error.message));
