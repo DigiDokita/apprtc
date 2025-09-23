@@ -116,7 +116,10 @@ var AppController = function(loadingParams) {
       this.show_(confirmJoinDiv);
 
       $(UI_CONSTANTS.confirmJoinButton).onclick = function() {
+        alert('Room ID: ' + this.loadingParams_.roomId);
         this.hide_(confirmJoinDiv);
+
+        console.log(this.loadingParams_.roomId);
 
         // Record this room in the recently used list.
         var recentlyUsedList = new RoomSelection.RecentlyUsedList();
