@@ -452,6 +452,8 @@ Call.prototype.joinRoom_ = function() {
     }
     var path = this.roomServer_ + '/join/' +
         this.params_.roomId + window.location.search;
+    alert('Room ID: ' + this.params_.roomId);
+    console.log('joinRoom_ path', path);
 
     sendAsyncUrlRequest('POST', path).then(function(response) {
       var responseObj = parseJSON(response);
