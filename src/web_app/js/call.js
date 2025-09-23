@@ -452,8 +452,8 @@ Call.prototype.joinRoom_ = function() {
     }
     var path = this.roomServer_ + '/join/' +
         this.params_.roomId + window.location.search;
-    //alert('Room ID: ' + this.params_.roomId);
-    trace('joinRoom_ path', path);
+    alert('Room ID: ' + this.params_.roomId);
+    trace('joinRoom_ path' + path);
 
     sendAsyncUrlRequest('POST', path).then(function(response) {
       var responseObj = parseJSON(response);
@@ -474,7 +474,7 @@ Call.prototype.joinRoom_ = function() {
         return;
       }
       trace('Joined the room@call.js');
-      trace('joinRoom_ path', path);
+      trace('joinRoom_ path' + path);
       resolve(responseObj.params);
     }.bind(this)).catch(function(error) {
       reject(Error('Failed to join the room: ' + error.message));
