@@ -483,7 +483,7 @@ Call.prototype.joinRoom_ = function() {
       var patientId = "0131890e-56db-4c71-9734-398bda63afe2";
       var meetingLink = encodeURIComponent(urlLinkToRoom);
 
-      var path = "http://localhost:8089/api/v1/doctor/meeting-notification"
+      var path = "http://localhost:8088/api/v1/doctor/meeting-notification"
           + "?patientId=" + patientId
           + "&meetingLink=" + meetingLink;
 
