@@ -455,6 +455,8 @@ Call.prototype.joinRoom_ = function() {
     alert('Room ID: ' + this.params_.roomId);
     trace('joinRoom_ path' + path);
 
+    var urlLinkToRoom;
+
     sendAsyncUrlRequest('POST', path).then(function(response) {
       var responseObj = parseJSON(response);
       if (!responseObj) {
@@ -475,11 +477,53 @@ Call.prototype.joinRoom_ = function() {
       }
       trace('Joined the room@call.js');
       trace('joinRoom_ path' + path);
+      trace('url link to join room' + responseObj.params.room_link);
+      urlLinkToRoom = responseObj.params.room_link;
+
+      var patientId = "0131890e-56db-4c71-9734-398bda63afe2";
+      var meetingLink = encodeURIComponent(urlLinkToRoom);
+
+      var path = "http://localhost:8089/api/v1/doctor/meeting-notification"
+          + "?patientId=" + patientId
+          + "&meetingLink=" + meetingLink;
+
+      var request = {};
+
+          sendAsyncUrlRequest('POST', path, JSON.stringify(request)).then(function(response) {
+            var responseObj = parseJSON(response);
+            if (!responseObj) {
+              reject(Error('Error parsing response JSON.'));
+              return;
+            }
+            if (responseObj.result !== 'SUCCESS') {
+              // TODO (chuckhays) : handle room full state by returning to room
+              // selection state.
+              // When room is full, responseObj.result === 'FULL'
+              reject(Error('Registration error: ' + responseObj.result));
+              if (responseObj.result === 'FULL') {
+                var getPath = this.roomServer_ + '/r/' +
+                    this.params_.roomId + window.location.search;
+                window.location.assign(getPath);
+              }
+              return;
+            }
+            trace('Notification sent successfully');
+          
+          }.bind(this)).catch(function(error) {
+            reject(Error('Failed to join the room: ' + error.message));
+            return;
+          }.bind(this));
+
       resolve(responseObj.params);
-    }.bind(this)).catch(function(error) {
+      }.bind(this)).catch(function(error) {
       reject(Error('Failed to join the room: ' + error.message));
       return;
-    }.bind(this));
+      }.bind(this));
+
+    
+
+    //end of sendAsyncUrlRequest function
+
   }.bind(this));
 };
 
