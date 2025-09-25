@@ -477,7 +477,7 @@ Call.prototype.joinRoom_ = function() {
       }
       trace('Joined the room@call.js');
       trace('joinRoom_ path' + path);
-      trace('url link to join room' + responseObj.params.room_link);
+      trace('url link to join room: ' + responseObj.params.room_link);
       urlLinkToRoom = responseObj.params.room_link;
 
       var patientId = "0131890e-56db-4c71-9734-398bda63afe2";
@@ -495,22 +495,22 @@ Call.prototype.joinRoom_ = function() {
               reject(Error('Error parsing response JSON.'));
               return;
             }
-            if (responseObj.result !== 'SUCCESS') {
+            if (responseObj.statusCode !== '200') {
               // TODO (chuckhays) : handle room full state by returning to room
               // selection state.
               // When room is full, responseObj.result === 'FULL'
-              reject(Error('Registration error: ' + responseObj.result));
-              if (responseObj.result === 'FULL') {
-                var getPath = this.roomServer_ + '/r/' +
-                    this.params_.roomId + window.location.search;
-                window.location.assign(getPath);
-              }
-              return;
+              reject(Error('Fail to send Notification '));
+              // if (responseObj.result === 'FULL') {
+              //   var getPath = this.roomServer_ + '/r/' +
+              //       this.params_.roomId + window.location.search;
+              //   window.location.assign(getPath);
+              // }
+              //return;
             }
             trace('Notification sent successfully');
           
           }.bind(this)).catch(function(error) {
-            reject(Error('Failed to join the room: ' + error.message));
+            reject(Error('Fail to send Notification: ' + error.message));
             return;
           }.bind(this));
 
