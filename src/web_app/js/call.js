@@ -480,39 +480,46 @@ Call.prototype.joinRoom_ = function() {
       trace('url link to join room: ' + responseObj.params.room_link);
       urlLinkToRoom = responseObj.params.room_link;
 
-      var patientId = "0131890e-56db-4c71-9734-398bda63afe2";
-      var meetingLink = encodeURIComponent(urlLinkToRoom);
+      // Retrieve patientId from local storage key 'auth_user' and send notification.
+      var storage = new Storage();
+      storage.getStorage('auth_user', function(authUserStr) {
+        var patientId = null;
+        if (authUserStr) {
+          try {
+            var authUser = JSON.parse(authUserStr);
+            patientId = authUser && (authUser.patientId || authUser.id || authUser.userId || authUser.user_id);
+          } catch (e) {
+            trace('Error parsing auth_user from storage: ' + e.message);
+          }
+        }
 
-      var path = "http://localhost:8088/api/v1/doctor/meeting-notification"
-          + "?patientId=" + patientId
-          + "&meetingLink=" + meetingLink;
+        if (!patientId) {
+          trace('No patientId found in auth_user; skipping meeting notification.');
+          return;
+        }
 
-      var request = {};
+        var meetingLink = encodeURIComponent(urlLinkToRoom);
+        var notifyPath = 'http://localhost:8088/api/v1/doctor/meeting-notification'
+            + '?patientId=' + encodeURIComponent(patientId)
+            + '&meetingLink=' + meetingLink;
 
-          sendAsyncUrlRequest('POST', path, JSON.stringify(request)).then(function(response) {
-            var responseObj = parseJSON(response);
-            if (!responseObj) {
-              reject(Error('Error parsing response JSON.'));
-              return;
-            }
-            if (responseObj.statusCode !== '200') {
-              // TODO (chuckhays) : handle room full state by returning to room
-              // selection state.
-              // When room is full, responseObj.result === 'FULL'
-              reject(Error('Fail to send Notification '));
-              // if (responseObj.result === 'FULL') {
-              //   var getPath = this.roomServer_ + '/r/' +
-              //       this.params_.roomId + window.location.search;
-              //   window.location.assign(getPath);
-              // }
-              //return;
-            }
-            trace('Notification sent successfully');
-          
-          }.bind(this)).catch(function(error) {
-            reject(Error('Fail to send Notification: ' + error.message));
+        var request = {};
+        sendAsyncUrlRequest('POST', notifyPath, JSON.stringify(request)).then(function(response) {
+          var notifyResponse = parseJSON(response);
+          if (!notifyResponse) {
+            trace('Error parsing meeting-notification response JSON.');
             return;
-          }.bind(this));
+          }
+          if (notifyResponse.statusCode !== 200) {
+            trace('Failed to send meeting notification.');
+            return;
+          }
+          trace('Notification sent successfully');
+        }.bind(this)).catch(function(error) {
+          trace('Fail to send Notification: ' + error.message);
+          return;
+        }.bind(this));
+      }.bind(this));
 
       resolve(responseObj.params);
       }.bind(this)).catch(function(error) {
