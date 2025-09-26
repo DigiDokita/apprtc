@@ -486,7 +486,7 @@ Call.prototype.joinRoom_ = function() {
         var patientId = null;
         if (authUserStr) {
           try {
-            var authUser = JSON.parse(authUserStr);
+            var authUser = parseJSON(authUserStr);
             patientId = authUser && (authUser.patientId || authUser.id || authUser.userId || authUser.user_id);
           } catch (e) {
             trace('Error parsing auth_user from storage: ' + e.message);
